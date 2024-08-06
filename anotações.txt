@@ -18,4 +18,8 @@ https://xfoynnvmczggrpuejzug.supabase.co
 
 6-em seguida pegar a anon public (abaixo de project url) e por na .env 
 SUPABASE_ANON_PUBLIC='anon public'
-REFAZER ENV PAREI EM 2:55
+
+7-limpar arquivo e deixar apenas App.tsx e node.modules, assets etc... 
+-em seguida rodar o npx expo start
+-configurado '.expo\types\router.d.ts' 
+-criado arquivo index.tsx para App.tsx aparecer já na tela inicial
