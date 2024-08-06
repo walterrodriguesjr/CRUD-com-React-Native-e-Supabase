@@ -25,4 +25,3 @@ SUPABASE_ANON_PUBLIC='anon public'
 -criado arquivo index.tsx para App.tsx aparecer já na tela inicial
 
 8-INICIANDO A ESTRUTURAÇÃO DA TELA 
--PAREI EM 4:12 EXATO
