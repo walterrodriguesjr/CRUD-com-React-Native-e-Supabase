@@ -1,3 +1,5 @@
-import App from './App';
+import LoginScreen from './screens/LoginScreen';
 
-export default App;
+export default function Index() {
+  return <LoginScreen />;
+}
