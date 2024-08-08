@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { supabase } from '@/services/supabase';
 import FlashMessage, { showMessage } from 'react-native-flash-message';
-import Spinner from 'react-native-loading-spinner-overlay';
 import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // Estado para o spinner
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -21,9 +20,8 @@ export default function LoginScreen() {
       return;
     }
 
-    setLoading(true); // Inicia o spinner imediatamente ao clicar no botão
-
     try {
+      setLoading(true);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
@@ -55,18 +53,12 @@ export default function LoginScreen() {
         });
       }
     } finally {
-      setLoading(false); // Para o spinner
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Spinner
-        visible={loading} // Exibe o spinner se estiver carregando
-        textContent={'Validando...'}
-        textStyle={styles.spinnerTextStyle}
-        overlayColor="rgba(0, 0, 0, 0.75)"
-      />
       <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
@@ -83,6 +75,9 @@ export default function LoginScreen() {
         value={password}
       />
       <Button title="Login" onPress={handleLogin} disabled={loading} />
+      <TouchableOpacity onPress={() => router.push('forgot-password')}>
+        <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
+      </TouchableOpacity>
       <FlashMessage position="top" />
     </View>
   );
@@ -108,7 +103,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 12,
   },
-  spinnerTextStyle: {
-    color: '#FFF',
+  forgotPasswordText: {
+    marginTop: 12,
+    textAlign: 'center',
+    color: '#007AFF',
   },
 });
