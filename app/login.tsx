@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
-import { supabase } from '@/services/supabase';
 import FlashMessage, { showMessage } from 'react-native-flash-message';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -22,36 +22,33 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const response = await axios.post('http://192.168.0.13:8000/api/login', {
+        email: email,
+        password: password
+      });
 
-      if (error) {
-        showMessage({
-          message: "Erro",
-          description: error.message,
-          type: "danger",
-        });
-      } else {
+      if (response.data.token) {
         showMessage({
           message: "Sucesso",
           description: "Login efetuado com sucesso!",
           type: "success",
         });
-        router.replace('/home');
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        showMessage({
-          message: "Erro",
-          description: error.message,
-          type: "danger",
-        });
+        // Se necessário, você pode armazenar o token ou executar outras ações
+        // router.replace('/home'); // Descomente se você quiser redirecionar após o login
       } else {
         showMessage({
           message: "Erro",
-          description: "Ocorreu um erro desconhecido",
+          description: "Credenciais inválidas, tente novamente.",
           type: "danger",
         });
       }
+    } catch (error) {
+      console.error(error);
+      showMessage({
+        message: "Erro",
+        description: "Ocorreu um erro ao tentar logar.",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }

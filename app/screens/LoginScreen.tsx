@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { supabase } from '@/services/supabase';
+import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import FlashMessage, { showMessage } from 'react-native-flash-message';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -22,36 +22,32 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const response = await axios.post('http://192.168.0.13:8000/api/login', {
+        email: email,
+        password: password
+      });
 
-      if (error) {
-        showMessage({
-          message: "Erro",
-          description: error.message,
-          type: "danger",
-        });
-      } else {
+      if (response && response.data && response.data.token) {
         showMessage({
           message: "Sucesso",
           description: "Login efetuado com sucesso!",
           type: "success",
         });
-        router.replace('/home'); // Redireciona para a tela principal após o login
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        showMessage({
-          message: "Erro",
-          description: error.message,
-          type: "danger",
-        });
+        // Salve o token ou prossiga para a próxima tela
       } else {
         showMessage({
           message: "Erro",
-          description: "Ocorreu um erro desconhecido",
+          description: "Credenciais inválidas, tente novamente.",
           type: "danger",
         });
       }
+    } catch (error) {
+      console.error(error);
+      showMessage({
+        message: "Erro",
+        description: error.response?.data?.error || "Ocorreu um erro ao tentar logar.",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -64,20 +60,17 @@ export default function LoginScreen() {
         style={styles.input}
         placeholder="Email"
         keyboardType="email-address"
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={setEmail}
         value={email}
       />
       <TextInput
         style={styles.input}
         placeholder="Senha"
         secureTextEntry
-        onChangeText={(text) => setPassword(text)}
+        onChangeText={setPassword}
         value={password}
       />
       <Button title="Login" onPress={handleLogin} disabled={loading} />
-      <TouchableOpacity onPress={() => router.push('forgot-password')}>
-        <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
-      </TouchableOpacity>
       <FlashMessage position="top" />
     </View>
   );
@@ -102,10 +95,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 12,
-  },
-  forgotPasswordText: {
-    marginTop: 12,
-    textAlign: 'center',
-    color: '#007AFF',
   },
 });
